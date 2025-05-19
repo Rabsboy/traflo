@@ -59,7 +59,17 @@ Route::group(['middleware' => 'auth'], function() {
 
     
 });
+// Verifikasi pembayaran
+Route::post('/bookings/{id}/update-status', [BookingController::class, 'updatePaymentStatus'])->name('bookings.updateStatus');
+
 Route::get('/admin/bookings', [BookingController::class, 'index'])->name('admin.bookings');
 Route::post('/booking/{id}', [BookingController::class, 'storeBooking'])->name('booking.store');
 // Define the route for the booking success page
 Route::get('/booking/success/{id}', [BookingController::class, 'bookingSuccess'])->name('booking.success');
+
+Route::get('/cek-booking', [BookingController::class, 'showCheckBookingForm'])->name('booking.form');
+Route::post('/cek-booking', [BookingController::class, 'checkBooking'])->name('booking.check');
+
+Route::post('/midtrans/notification', [BookingController::class, 'midtransNotification'])->name('midtrans.notification');
+Route::get('/payment/form', [DummyPaymentController::class, 'form'])->name('payment.form');
+Route::post('/payment/process', [DummyPaymentController::class, 'process'])->name('payment.process');

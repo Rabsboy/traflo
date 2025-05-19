@@ -2,59 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use Illuminate\Http\Request;
+use App\Services\MidtransService;
+use App\Models\Booking;
 
 class DummyPaymentController extends Controller
 {
-    public function process(Request $request)
+    protected $midtrans;
+
+    public function __construct(MidtransService $midtrans)
     {
-        // Data transaksi dummy
-        $paymentStatus = ['success', 'pending', 'failed'];
-        $status = $paymentStatus[array_rand($paymentStatus)];
-
-        // Data hasil pembayaran
-        $result = [
-            'order_id' => uniqid(),
-            'gross_amount' => $request->amount,
-            'status' => $status,
-            'customer_name' => $request->name,
-            'customer_email' => $request->email,
-        ];
-
-        // Tampilkan halaman hasil pembayaran
-        return view('payment.result', ['result' => $result]);
+        $this->midtrans = $midtrans;
     }
 
-    public function form()
-    {
-        return view('payment.form');
-    }
-
-public function storeBooking(Request $request, $id)
+   public function process(Request $request)
 {
-    // Validate incoming request data
     $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:20',
-        'payment_method' => 'required|string',
+        'amount' => 'required|numeric|min:1',
+        'travel_package_id' => 'required|exists:travel_packages,id',
     ]);
 
-    // Create a new booking entry
-    $booking = new Booking([
-        'name' => $request->name,
-        'email' => $request->email,
-        'phone' => $request->phone,
-        'travel_package_id' => $id,  // This assumes you have the package ID
-        'payment_method' => $request->payment_method,
-    ]);
+    $orderId = uniqid('order-');
 
-    // Save the booking
-    $booking->save();
+    $params = [
+        'transaction_details' => [
+            'order_id' => $orderId,
+            'gross_amount' => $request->amount,
+        ],
+        'customer_details' => [
+            'first_name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ],
+    ];
 
-    // Redirect or show confirmation page
-    return redirect()->route('booking.success', ['id' => $booking->id]);  // Assuming a success page
+    try {
+        $transaction = $this->midtrans->createTransaction($params);
+
+        if (isset($transaction->token)) {
+            Booking::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'travel_package_id' => $request->travel_package_id,
+                'payment_method' => 'Midtrans',
+                'booking_code' => $orderId,
+                'payment_status' => 'pending', 
+            ]);
+
+            return response()->json(['snapToken' => $transaction->token]);
+        }
+
+        return response()->json(['error' => 'Gagal mendapatkan token pembayaran.'], 500);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
 }
 
 }
