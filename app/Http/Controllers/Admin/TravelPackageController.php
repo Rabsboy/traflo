@@ -57,11 +57,15 @@ class TravelPackageController extends Controller
 
         return redirect()->route('admin.travel-packages.index')->with('message', 'Updated Successfully !');;
     }
+public function destroy(TravelPackage $travelPackage): RedirectResponse
+{
+    // Hapus semua gallery terkait
+    $travelPackage->galleries()->delete();
 
-    public function destroy(TravelPackage $travelPackage): RedirectResponse
-    {
-        $travelPackage->delete();
+    // Hapus travel package
+    $travelPackage->delete();
 
-        return redirect()->route('admin.travel-packages.index')->with('message', 'Deleted Successfully');
-    }
+    return redirect()->route('admin.travel-packages.index')->with('message', 'Deleted Successfully');
+}
+
 }

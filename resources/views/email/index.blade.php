@@ -6,8 +6,8 @@
     <title>Email</title>
 </head>
 <body>
-    <h1>{{ $detail['name'] }}</h1>
-    <h5>{{ $detail['email'] }}</h5>
-    <p>{{ $detail['message'] }}</p>
+    <h3>Nama Customer : {{ $detail['name'] }}</h1>
+    <h5>E-mail Customer : {{ $detail['email'] }}</h5>
+    <p>Pesan : "{{ $detail['message'] }}"</p>
 </body>
 </html>

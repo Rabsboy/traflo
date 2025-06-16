@@ -1,51 +1,88 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-5">
-    <h2>Cek Booking Anda</h2>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
 
-    @if(session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
-    @endif
+            <div class="card shadow-lg border-0 rounded-4 animate__animated animate__fadeInUp">
+                <div class="card-body p-5">
 
-    <form action="{{ route('booking.check') }}" method="POST" class="mb-4">
-        @csrf
-        <div class="form-group">
-            <label for="email">Masukkan Email Anda</label>
-            <input type="email" name="email" id="email" class="form-control" required
-                value="{{ old('email') }}">
+                    <h2 class="mb-4 text-center fw-bold">📋 Riwayat Booking Anda</h2>
+
+                    @if(!Auth::check())
+                        <div class="text-center">
+                            <img src="{{ asset('images/login-promt.jpg') }}" alt="Login Illustration" class="mb-3" style="max-width: 300px;">
+                            <p class="lead">Silakan <a href="{{ route('login') }}" class="text-decoration-none text-primary fw-semibold">LOGIN</a> untuk melihat riwayat booking Anda.</p>
+                        </div>
+                    @else
+                        @if(Auth::user()->is_admin)
+                            <div class="text-center">
+                                <h4 class="mb-3">Anda adalah Administrator</h4>
+                                <p class="lead text-muted">Halaman ini hanya untuk customer. Silakan akses halaman admin Anda.</p>
+                                <a href="{{ route('admin.bookings') }}" class="btn btn-primary mt-3">
+                                    🔧 Lihat Daftar Booking Customer
+                                </a>
+                            </div>
+                        @elseif($bookings->isEmpty())
+                            <div class="text-center">
+                                <h4 class="mb-3">Belum ada booking</h4>
+                                <p class="lead text-muted">
+                                    Kamu belum melakukan booking dengan email <strong>{{ Auth::user()->email }}</strong>.
+                                </p>
+                                <a href="{{ route('package') }}" class="btn btn-success mt-3">Lakukan Booking Sekarang</a>
+                            </div>
+                        @else
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle rounded-3 overflow-hidden">
+                                    <thead class="table-primary text-white">
+                                        <tr>
+                                            <th>Kode Booking</th>
+                                            <th>Nama Paket</th>
+                                            <th>Status</th>
+                                            <th>Harga</th>
+                                            <th>Tanggal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($bookings as $booking)
+                                        <tr>
+                                            <td><span class="fw-semibold">{{ $booking->booking_code }}</span></td>
+                                            <td>{{ $booking->travelPackage->name }}</td>
+                                            <td>
+                                                @php
+                                                    $status = $booking->payment_status;
+                                                    $badgeClass = match($status) {
+                                                        'pending' => 'warning',
+                                                        'verified' => 'success',
+                                                        'cancelled' => 'danger',
+                                                        default => 'secondary',
+                                                    };
+                                                    $icon = match($status) {
+                                                        'pending' => '⏳',
+                                                        'verified' => '✅',
+                                                        'cancelled' => '❌',
+                                                        default => 'ℹ️',
+                                                    };
+                                                @endphp
+                                                <span class="badge bg-{{ $badgeClass }} rounded-pill px-3 py-2">
+                                                    {{ $icon }} {{ ucfirst($status) }}
+                                                </span>
+                                            </td>
+                                            <td>IDR {{ number_format($booking->travelPackage->price) }}</td>
+                                            <td>{{ $booking->created_at->format('d M Y') }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    @endif
+
+                </div>
+            </div>
+
         </div>
-        <button type="submit" class="btn btn-primary mt-2">Cari Booking</button>
-    </form>
-
-    @if(isset($bookings))
-        <h4>Hasil Booking untuk email: {{ request('email') }}</h4>
-        @if($bookings->isEmpty())
-            <p>Tidak ada booking ditemukan.</p>
-        @else
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Kode Booking</th>
-                        <th>Nama Paket</th>
-                        <th>Status Pembayaran</th>
-                        <th>Jumlah</th>
-                        <th>Tanggal Booking</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($bookings as $booking)
-                    <tr>
-                        <td>{{ $booking->booking_code }}</td>
-                        <td>{{ $booking->travelPackage->name }}</td>
-                        <td>{{ ucfirst($booking->payment_status) }}</td>
-                        <td>IDR {{ number_format($booking->travelPackage->price) }}</td>
-                        <td>{{ $booking->created_at->format('d M Y') }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    @endif
+    </div>
 </div>
 @endsection

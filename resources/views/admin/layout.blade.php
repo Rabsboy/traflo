@@ -1,90 +1,209 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Laravel Admin') }}</title>
 
     <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css?family=Nunito&display=swap" rel="stylesheet" />
 
-    <!-- Custom fonts for this template-->
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Summernote CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet" />
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
     @include('partials.admin.style')
 
+    <style>
+        /* Custom scrollbar for sidebar */
+        #sidebar-wrapper {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #6c757d #e9ecef;
+        }
+        #sidebar-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+        #sidebar-wrapper::-webkit-scrollbar-track {
+            background: #e9ecef;
+        }
+        #sidebar-wrapper::-webkit-scrollbar-thumb {
+            background-color: #6c757d;
+            border-radius: 4px;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: none;
+            width: 3rem;
+            height: 3rem;
+            text-align: center;
+            color: white;
+            background: #0d6efd;
+            line-height: 46px;
+            border-radius: 50%;
+            z-index: 9999;
+            transition: background-color 0.3s ease;
+        }
+        .scroll-to-top:hover {
+            background-color: #0b5ed7;
+            text-decoration: none;
+        }
+        /* Bikin sidebar tetap di kiri (fixed) */
+#sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    z-index: 1030;
+}
+
+/* Konten utama offset ke kanan supaya tidak tertutup sidebar */
+#content-wrapper {
+    
+    margin-left: 220px;
+    width: calc(100% - 250px);
+}
+
+/* Navbar juga di-offset */
+#content #navbar {
+    margin-left: 250px;
+}
+
+
+/* Responsive - Sidebar jadi relatif (non-fixed) di mobile */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    #content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+}
+
+    </style>
 </head>
-
 <body id="page-top">
+    <div id="wrapper" class="d-flex">
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
+        {{-- Sidebar --}}
+        @include('partials.admin.sidebar')
 
-        <!-- Sidebar -->
-            @include('partials.admin.sidebar')
-        <!-- End of Sidebar -->
+        {{-- Content Wrapper --}}
+        <div id="content-wrapper" class="d-flex flex-column min-vh-100">
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <!-- Main Content -->
+            {{-- Main Content --}}
             <div id="content">
-
-                <!-- Topbar -->
+                {{-- Navbar --}}
                 @include('partials.admin.navbar')
-                <!-- End of Topbar -->
 
-                <!-- Begin Page Content -->
-                @yield('content')
-                <!-- /.container-fluid -->
-
+                {{-- Page Content --}}
+                <main class="container-fluid py-4 flex-grow-1"style="margin-top: 80px;">
+                    @yield('content')
+                </main>
             </div>
-            <!-- End of Main Content -->
 
-            <!-- Footer -->
+            {{-- Footer --}}
             @include('partials.admin.footer')
-            <!-- End of Footer -->
-
         </div>
-        <!-- End of Content Wrapper -->
-
     </div>
-    <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
+    {{-- Scroll to Top Button --}}
+    <a href="#page-top" class="scroll-to-top" id="scrollTopBtn" aria-label="Scroll to top">
+        <i class="fas fa-angle-up fa-lg"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+    {{-- Logout Modal --}}
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-sm">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="logoutModalLabel">Siap untuk Keluar?</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-body">
+                    Pilih "Keluar" jika Anda siap mengakhiri sesi saat ini.
+                </div>
                 <div class="modal-footer">
-                  <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-primary" type="submit">Logout</button>
-                  </form>
+                    <form action="{{ route('logout') }}" method="POST" class="d-flex justify-content-between w-100">
+                        @csrf
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-danger">Keluar</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 
+    {{-- Scripts --}}
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap 5 Bundle JS (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Summernote -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
+    <!-- FontAwesome JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
     @include('partials.admin.script')
+
+    <script>
+      $(document).ready(function () {
+        $('.summernote').summernote({
+          height: 200,
+          placeholder: 'Tulis konten di sini...',
+          toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['strikethrough', 'superscript', 'subscript']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['codeview', 'help']]
+          ]
+        });
+      });
+
+      // Scroll to top button behavior
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 100) {
+          scrollTopBtn.style.display = 'block';
+        } else {
+          scrollTopBtn.style.display = 'none';
+        }
+      });
+
+      scrollTopBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      document.getElementById('sidebarToggleTop')?.addEventListener('click', function () {
+        const sidebar = document.getElementById('sidebar-wrapper');
+        if (sidebar) {
+            sidebar.classList.toggle('d-none');
+        }
+    });
+    </script>
+
     @stack('script-alt')
-
 </body>
-
 </html>

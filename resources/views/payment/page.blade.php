@@ -29,6 +29,7 @@
                 alert('Pembayaran dibatalkan.');
             }
         });
+        
     };
 </script>
 @endpush

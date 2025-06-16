@@ -30,6 +30,7 @@ class StoreContactMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('email from customer !')->view('email.index');
+        return $this->subject('email from customer TRAFLO')->view('email.index');
     }
 }
+

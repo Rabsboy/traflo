@@ -9,16 +9,16 @@
       >
         <div class="row justify-content-center mt-5">
             <div class="col-12 mb-4">
-                <div class="card post-detail pb-5 text-center">
+                <div class="card post-detail pb-5 text-center animate__animated animate__fadeIn">
                 <img src="{{ Storage::url($post->image) }}" alt="{{ $post->title }}">
 
-                  <div class="post-detail-data">
+                  <div class="post-detail-data animate__animated animate__fadeIn animate__delay-1s">
                     <div class="card-post-data mt-2">
                       <span>Travel</span> <small> - {{ $post->created_at->diffForHumans() }}</small>
                       <h3 class="mt-1 px-2">{{ $post->title }}</h3>
                     </div>
                   </div>
-                  <div class="card-body p-4 post-body">
+                  <div class="card-body p-4 post-body animate__animated animate__fadeIn animate__delay-1s">
                       {!! $post->content !!}
                   </div>
                 </div>

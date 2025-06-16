@@ -1,32 +1,19 @@
-<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-    <!-- Sidebar Toggle (Topbar) -->
-    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+<nav class="navbar navbar-expand navbar-light bg-white shadow-sm fixed-top px-4">
+    <!-- Sidebar Toggle (Responsive) -->
+    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle me-3">
         <i class="fa fa-bars"></i>
     </button>
 
-
-    <!-- Topbar Navbar -->
-    <ul class="navbar-nav ml-auto">
-
-        <!-- Nav Item - User Information -->
-        <li class="nav-item dropdown no-arrow">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="nav__name">{{ Auth::user()->name }}</span>
-                <img class="img-profile rounded-circle"
-                    src="{{ asset('backend/img/undraw_profile.svg') }}">
+    <!-- Right Side Navbar -->
+    <ul class="navbar-nav ms-auto d-flex align-items-center">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                <span class="me-2 text-dark small">{{ Auth::user()->name }}</span>
+                <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name) }}&background=0D8ABC&color=fff" width="32" height="32" alt="User Avatar">
             </a>
-            <!-- Dropdown - User Information -->
-            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Logout
-                </a>
-            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
+                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">Keluar</a></li>
+            </ul>
         </li>
-
     </ul>
-
 </nav>

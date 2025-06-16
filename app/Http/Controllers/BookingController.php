@@ -8,6 +8,8 @@ use App\Models\TravelPackage;
 use Midtrans\Snap;
 use Midtrans\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class BookingController extends Controller
 {
@@ -38,6 +40,7 @@ class BookingController extends Controller
             'payment_method' => $request->payment_method,
             'booking_code' => $bookingCode,
             'payment_status' => 'pending',
+            'user_id' => Auth::id(),
         ]);
 
         // Setup konfigurasi Midtrans
@@ -129,31 +132,49 @@ class BookingController extends Controller
         }
     }
 
-    public function index()
-    {
-        $bookings = Booking::with('travelPackage')->get();
-        return view('admin.bookings.index', compact('bookings'));
+   public function index(Request $request)
+{
+    $query = Booking::with('travelPackage');
+
+    if ($request->filled('status')) {
+        $status = $request->input('status');
+        if (in_array($status, ['pending', 'verified', 'cancelled'])) {
+            $query->where('payment_status', $status);
+        }
     }
+
+    $bookings = $query->get();
+
+    return view('admin.bookings.index', compact('bookings'));
+}
 
     public function showCheckBookingForm()
-    {
-        return view('cek-booking');
+{
+    $userEmail = auth()->check() ? auth()->user()->email : null;
+    $bookings = null;
+
+    if ($userEmail) {
+        $bookings = Booking::with('travelPackage')
+                    ->where('email', $userEmail)
+                    ->get();
     }
+
+    return view('cek-booking', compact('bookings'));
+}
 
     public function checkBooking(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
-
-        $bookings = Booking::with('travelPackage')->where('email', $request->email)->get();
-
-        if ($bookings->isEmpty()) {
-            return back()->with('error', 'Tidak ada booking dengan email tersebut.');
-        }
-
-        return view('cek-booking', compact('bookings'));
+{
+    $user = Auth::user();
+    if (!$user) {
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu');
     }
+
+    $bookings = Booking::with('travelPackage')
+                ->where('email', $user->email)
+                ->get();
+
+    return view('cek-booking', compact('bookings'));
+}
 
     public function updatePaymentStatus(Request $request, $id)
     {
@@ -171,5 +192,12 @@ class BookingController extends Controller
         $booking->save();
 
         return redirect()->back()->with('success', 'Status pembayaran berhasil diperbarui.');
+    }
+        public function userBookings($userId)
+    {
+        $user = User::with('bookings.travelPackage')->findOrFail($userId);
+        $bookings = $user->bookings;
+
+        return view('admin.user.bookings', compact('user', 'bookings'));
     }
 }

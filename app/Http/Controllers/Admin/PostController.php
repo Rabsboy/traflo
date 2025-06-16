@@ -59,7 +59,7 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('message', 'Updated Successfully !');
     }
 
-    public function destroy(Post $post): View
+    public function destroy(Post $post)
     {
         if($post->image){
             File::delete('storage/' . $post->image);

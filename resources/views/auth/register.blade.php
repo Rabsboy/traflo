@@ -68,6 +68,9 @@
                                 </button>
                             </div>
                         </div>
+                        <a class="btn btn-link" href="{{ route('login') }}">
+                                    {{ __("Already Have account? Login") }}
+                                </a>
                     </form>
                 </div>
             </div>

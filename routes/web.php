@@ -2,9 +2,13 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\DummyPaymentController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Auth\CustomerAuthController;
+use App\Http\Controllers\Admin\AdminBookingController;
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Admin\AdminFooterController;
 
 
 /*
@@ -17,6 +21,8 @@ use App\Http\Controllers\BookingController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,6 +42,8 @@ Route::get('posts/{post:slug}', [App\Http\Controllers\PageController::class, 'de
 Route::get('paket-travel', [App\Http\Controllers\PageController::class, 'package'])->name('package');
 Route::get('detail/{travelPackage}', [App\Http\Controllers\PageController::class, 'detail'])->name('detail');
 
+Route::get('/about-us', [PageController::class, 'about'])->name('about');
+
 Route::get('/auth/login', [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/auth/login', [\App\Http\Controllers\Auth\LoginController::class, 'login']);
 Route::get('/auth/register', [\App\Http\Controllers\Auth\RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -54,17 +62,24 @@ Route::group(['middleware' => 'auth'], function() {
         Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
         Route::resource('travel-packages', \App\Http\Controllers\Admin\TravelPackageController::class);
         Route::resource('travel-packages.galleries', \App\Http\Controllers\Admin\GalleryController::class);
-
+        Route::get('/users', [App\Http\Controllers\Admin\AdminBookingController::class, 'userList'])->name('admin.user.index');
+        Route::get('/users/{user}/bookings', [AdminBookingController::class, 'userBookings'])->name('admin.user.booking');
+ Route::get('footer/edit', [App\Http\Controllers\Admin\AdminFooterController::class, 'index'])->name('footer.edit');
+    Route::put('footer/update', [App\Http\Controllers\Admin\AdminFooterController::class, 'update'])->name('admin.footer.update');
+  
+    Route::resource('team', TeamController::class);
     });
 
     
 });
+Route::get('/our-team', [App\Http\Controllers\TeamController::class, 'index'])->name('our-team');
 // Verifikasi pembayaran
 Route::post('/bookings/{id}/update-status', [BookingController::class, 'updatePaymentStatus'])->name('bookings.updateStatus');
+Route::post('/payment/update-status', [DummyPaymentController::class, 'updateStatus']);
 
 Route::get('/admin/bookings', [BookingController::class, 'index'])->name('admin.bookings');
 Route::post('/booking/{id}', [BookingController::class, 'storeBooking'])->name('booking.store');
-// Define the route for the booking success page
+
 Route::get('/booking/success/{id}', [BookingController::class, 'bookingSuccess'])->name('booking.success');
 
 Route::get('/cek-booking', [BookingController::class, 'showCheckBookingForm'])->name('booking.form');

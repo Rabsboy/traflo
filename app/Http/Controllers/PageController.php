@@ -9,6 +9,10 @@ use App\Mail\StoreContactMail;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\StoreEmailRequest;
 use App\Models\Category;
+use App\Models\Setting;
+use App\Models\Team;
+
+
 
 class PageController extends Controller
 {
@@ -16,8 +20,9 @@ class PageController extends Controller
     {
         $categories = Category::with('travel_packages')->get();
         $posts = Post::get();
+        $teams=team::all();
 
-        return view('home', compact('categories','posts'));
+        return view('home', compact('categories','posts','teams'));
     }
 
     public function detail(TravelPackage $travelPackage): View
@@ -55,4 +60,15 @@ class PageController extends Controller
         Mail::to('muhammadsadiq2299@gmail.com')->send(new StoreContactMail($detail));
         return back()->with('message', 'Terimakasih atas feedbacknya ! kami akan membacanya sesegera mungkin');
     }
+    public function about()
+    {
+        $teams=team::all();
+    return view('about-us', compact('teams'));
+    }
+public function ourTeam()
+{
+    $teams = Team::all();
+    return view('our-team', compact('teams'));
+}
+
 }

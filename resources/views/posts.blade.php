@@ -2,51 +2,67 @@
 
 @section('content')
 <main>
-      <!--=============== HOME ===============-->
-      <section
-        class="hero"
-        id="hero"
-        style="
-          background-repeat: no-repeat;
-          background-size: cover;
-          height: 50vh;
-          background-image: url('https://media.istockphoto.com/photos/selfie-of-girl-with-turtle-underwater-picture-id950473038?b=1&k=20&m=950473038&s=170667a&w=0&h=o60q1wOQMimHuch1T9KSwGFgehQpwPcxfKtiw0khhZ4=');
-        "
-      >
-        <div
-          class="hero-content h-100 d-flex justify-content-center align-items-center flex-column"
-        >
-          <h1 class="text-center text-white display-4">
-           Blog Kami
-          </h1>
+  <!--=============== HOME ===============-->
+  <section
+    class="hero"
+    id="hero"
+    style="
+      background-repeat: no-repeat;
+      background-size: cover;
+      height: 50vh;
+      background-image: url('{{ asset('storage/images/blog.jpg') }}');
+    "
+  >
+    <div
+      class="hero-content h-100 d-flex justify-content-center align-items-center flex-column"
+    >
+      <h1 class="display-4 fw-bold text-white animate__animated animate__fadeInDown">
+       Blog Kami
+      </h1>
 
-          <hr width="40" class="text-center" />
-        </div>
-      </section>
+      <hr width="40" class="text-center" />
+    </div>
+  </section>
 
-      <!--=============== Blog ===============-->
-      <section
-        class="container blog"
-        style="margin-top: -140px; z-index: 2; position: relative"
-      >
-        <div class="row justify-content-center mt-5">
-         
-        @foreach($posts as $post)
-          <div class="col-lg-4 mb-4 blogpost">
-            <a href="{{ route('posts.show', $post)  }}">
-              <div class="card-post">
-                <div class="card-post-img">
-                  <img src="{{ Storage::url($post->image) }}"alt="{{ $post->title }}">
-                </div>
-                <div class="card-post-data">
-                  <span>Travel</span> <small>- {{ $post->created_at->diffForHumans() }}</small>
-                  <h5>{{ $post->title }}</h5>
-                </div>
-              </div>
-            </a>
-          </div>
-        @endforeach
-        </div>
-      </section>
-    </main>
+  <!--=============== Blog ===============-->
+  <section class="container my-5 text-center">
+    <h2 class="display-6 fw-bold animate__animated animate__fadeInUp">Cerita Perjalanan & Tips Wisata</h2>
+    <hr class="mx-auto mb-4" style="width: 60px; border-top: 3px solid #28a745;" />
+    <p>Temukan inspirasi dan cerita seru dari para traveler di blog kami!</p>
+    <div class="animate__animated animate__fadeInUp row justify-content-center g-4 mt-4">
+      @foreach($posts as $post)
+      <div class="col-md-6 col-lg-4">
+        <a href="{{ route('posts.show', $post) }}" class="text-decoration-none text-dark">
+          <div class="card shadow-sm h-100 blog-card animate__animated animate__fadeInUp animate__delay-1s">
+  <img 
+    src="{{ Storage::url($post->image) }}" 
+    alt="{{ $post->title }}" 
+    class="card-img-top object-fit-cover" 
+    style="height: 180px;"
+  >
+  <div class="card-body text-start">
+    <small class="text-muted">Traflo - {{ $post->created_at->diffForHumans() }}</small>
+    <h5 class="card-title mt-2">{{ $post->title }}</h5>
+    <p class="card-text text-muted">
+      {{ Str::limit(strip_tags($post->content), 100, '...') }}
+    </p>
+  </div>
+</div>
+
+        </a>
+      </div>
+      @endforeach
+    </div>
+  </section>
+</main>
 @endsection
+
+@push('style-alt')
+<style>
+  .blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+</style>
+@endpush
