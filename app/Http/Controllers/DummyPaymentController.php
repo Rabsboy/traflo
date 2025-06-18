@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\MidtransService;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class DummyPaymentController extends Controller
 {
@@ -24,6 +25,13 @@ class DummyPaymentController extends Controller
         'phone' => 'required|string|max:20',
         'amount' => 'required|numeric|min:1',
         'travel_package_id' => 'required|exists:travel_packages,id',
+        'departure_date' => [
+    'required',
+    'date',
+    Rule::exists('departure_schedules', 'departure_date')
+        ->where(fn ($query) => $query->where('travel_package_id', $request->travel_package_id)),
+],
+
     ]);
 
     $orderId = uniqid('order-');
@@ -54,6 +62,7 @@ class DummyPaymentController extends Controller
                 'payment_method' => 'Midtrans',
                 'booking_code' => $orderId,
                 'payment_status' => 'pending',
+                'departure_date' => $request->departure_date,
             ]);
 
             return response()->json(['snapToken' => $transaction->token]);

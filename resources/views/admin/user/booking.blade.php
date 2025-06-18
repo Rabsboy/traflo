@@ -23,6 +23,7 @@
                             <tr>
                                 <th>Kode Booking</th>
                                 <th>Nama Paket</th>
+                                <th>Tanggal Keberangkatan</th>
                                 <th>Status Pembayaran</th>
                                 <th>Jumlah</th>
                                 <th>Tanggal Booking</th>
@@ -33,6 +34,13 @@
                                 <tr>
                                     <td>{{ $booking->booking_code }}</td>
                                     <td>{{ $booking->travelPackage->name }}</td>
+                                    <td>
+                                        @if($booking->departure_date)
+                                            {{ \Carbon\Carbon::parse($booking->departure_date)->format('d M Y') }}
+                                        @else
+                                            <span class="text-muted fst-italic">Belum ditentukan</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @php
                                             $status = strtolower($booking->payment_status);

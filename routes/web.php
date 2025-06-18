@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\AdminBookingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\AdminFooterController;
-
+use App\Http\Controllers\Admin\DepartureScheduleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,11 +66,9 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('/users/{user}/bookings', [AdminBookingController::class, 'userBookings'])->name('admin.user.booking');
  Route::get('footer/edit', [App\Http\Controllers\Admin\AdminFooterController::class, 'index'])->name('footer.edit');
     Route::put('footer/update', [App\Http\Controllers\Admin\AdminFooterController::class, 'update'])->name('admin.footer.update');
-  
-    Route::resource('team', TeamController::class);
-    });
-
-    
+Route::post('/departure-schedules', [DepartureScheduleController::class, 'store'])->name('departure-schedules.store');
+Route::delete('/departure-schedules/{schedule}', [DepartureScheduleController::class, 'destroy'])->name('departure-schedules.destroy');
+    Route::resource('team', TeamController::class);});
 });
 Route::get('/our-team', [App\Http\Controllers\TeamController::class, 'index'])->name('our-team');
 // Verifikasi pembayaran
@@ -88,3 +86,4 @@ Route::post('/cek-booking', [BookingController::class, 'checkBooking'])->name('b
 Route::post('/midtrans/notification', [BookingController::class, 'midtransNotification'])->name('midtrans.notification');
 Route::get('/payment/form', [DummyPaymentController::class, 'form'])->name('payment.form');
 Route::post('/payment/process', [DummyPaymentController::class, 'process'])->name('payment.process');
+Route::get('/booking/{id}/invoice', [App\Http\Controllers\BookingController::class, 'downloadPdf'])->name('booking.invoice.pdf');

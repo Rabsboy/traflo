@@ -10,6 +10,8 @@ use Midtrans\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\DepartureSchedule;
 
 class BookingController extends Controller
 {
@@ -21,6 +23,8 @@ class BookingController extends Controller
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:20',
             'payment_method' => 'required|string',
+            'departure_date'=>'required|date',
+
         ]);
 
         // Validasi apakah travel package ada
@@ -41,6 +45,7 @@ class BookingController extends Controller
             'booking_code' => $bookingCode,
             'payment_status' => 'pending',
             'user_id' => Auth::id(),
+            'departure_date' => $request->departure_date,
         ]);
 
         // Setup konfigurasi Midtrans
@@ -200,4 +205,21 @@ class BookingController extends Controller
 
         return view('admin.user.bookings', compact('user', 'bookings'));
     }
+
+public function downloadPdf($id)
+{
+    $booking = Booking::with('travelPackage')->findOrFail($id);
+
+    // Pastikan user hanya bisa download miliknya sendiri (opsional tapi aman)
+    if ($booking->email !== Auth::user()->email) {
+        abort(403, 'Unauthorized access to invoice.');
+    }
+
+    $user = Auth::user();
+
+    $pdf = PDF::loadView('invoice', compact('user', 'booking'));
+    return $pdf->download('invoice-booking-' . $booking->booking_code . '.pdf');
+}
+
+
 }

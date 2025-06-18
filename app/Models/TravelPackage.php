@@ -18,4 +18,9 @@ class TravelPackage extends Model
     public function category(){
         return $this->belongsTo(Category::class);
     }
+public function departures()
+{
+    return $this->hasMany(DepartureSchedule::class);
+}
+
 }

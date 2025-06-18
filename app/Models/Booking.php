@@ -16,7 +16,8 @@ class Booking extends Model
         'travel_package_id',
         'payment_method',
         'booking_code',
-        'payment_status'
+        'payment_status',
+        'departure_date'
 
     ];
     public function travelPackage()

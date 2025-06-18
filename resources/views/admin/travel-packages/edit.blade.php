@@ -124,6 +124,50 @@
                     <button type="submit" class="btn btn-primary btn-block">Save Image</button>
                 </form>
             </div>
+            <!-- Form Tambah dan Daftar Tanggal Keberangkatan -->
+<div class="card-body">
+    <h5>Tambah Tanggal Keberangkatan</h5>
+    <form action="{{ route('admin.departure-schedules.store') }}" method="POST">
+        @csrf
+        <input type="hidden" name="travel_package_id" value="{{ $travelPackage->id }}">
+        <div class="form-group">
+            <label for="departure_date">Tanggal Keberangkatan</label>
+            <input type="date" class="form-control" name="departure_date" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Tambah Tanggal</button>
+    </form>
+
+    <hr>
+
+    <h5 class="mt-4">Daftar Tanggal Keberangkatan</h5>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tanggal</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($travelPackage->departures as $schedule)
+                <tr>
+                    <td>{{ $schedule->id }}</td>
+                    <td>{{ \Carbon\Carbon::parse($schedule->departure_date)->format('d M Y') }}</td>
+                    <td>
+                        <form action="{{ route('admin.departure-schedules.destroy', $schedule) }}" method="POST" onsubmit="return confirm('Yakin hapus tanggal ini?')">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="3" class="text-center">Belum ada tanggal keberangkatan</td></tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+
         </div>
     </div>
 </div>

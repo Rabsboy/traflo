@@ -26,17 +26,14 @@
         border-radius: 0.35rem;
     }
 
-    /* Hover effect for rows */
     .table-hover tbody tr:hover {
         background-color: #f1f5f9;
     }
 
-    /* Button spacing */
     .action-buttons form + form {
         margin-top: 0.3rem;
     }
 
-    /* Filter form */
     .filter-form {
         margin-bottom: 1rem;
         display: flex;
@@ -50,7 +47,6 @@
         <div class="card-body">
             <h4 class="mb-4">📋 Daftar Booking</h4>
 
-            <!-- Filter Form -->
             <form method="GET" action="{{ route('admin.bookings') }}" class="filter-form">
                 <label for="filter_status" class="form-label mb-0">Filter Status:</label>
                 <select name="status" id="filter_status" class="form-select form-select-sm" style="max-width: 160px;">
@@ -86,6 +82,7 @@
                             <th>Email</th>
                             <th>Telepon</th>
                             <th>Paket Travel</th>
+                            <th>Tgl Keberangkatan</th>
                             <th>Metode Pembayaran</th>
                             <th>Kode Booking</th>
                             <th>Tanggal Booking</th>
@@ -101,6 +98,7 @@
                                 <td>{{ $booking->email }}</td>
                                 <td>{{ $booking->phone }}</td>
                                 <td>{{ $booking->travelPackage->name }}</td>
+                                <td>{{ \Carbon\Carbon::parse($booking->departure_date)->format('d M Y') }}</td>
                                 <td>{{ ucfirst(str_replace('-', ' ', $booking->payment_method)) }}</td>
                                 <td><code>{{ $booking->booking_code }}</code></td>
                                 <td>{{ $booking->created_at->format('d-m-Y H:i') }}</td>
@@ -125,15 +123,14 @@
                                                 <option value="verified" {{ $booking->payment_status === 'verified' ? 'selected' : '' }}>Verified</option>
                                                 <option value="cancelled" {{ $booking->payment_status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                                             </select>
-                                            <button type="submit" class="btn btn-sm btn-primary" aria-label="Update status">Update</button>
+                                            <button type="submit" class="btn btn-sm btn-primary">Update</button>
                                         </form>
 
                                         <form action="{{ route('bookings.updateStatus', $booking->id) }}" method="POST" class="d-block">
                                             @csrf
                                             <input type="hidden" name="payment_status" value="cancelled">
                                             <button type="submit" class="btn btn-sm btn-danger w-100" 
-                                                onclick="return confirm('Yakin ingin membatalkan booking ini?')"
-                                                aria-label="Batalkan booking">
+                                                onclick="return confirm('Yakin ingin membatalkan booking ini?')">
                                                 <i class="bi bi-x-circle me-1"></i> Batalkan
                                             </button>
                                         </form>
@@ -144,7 +141,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">Belum ada booking yang tersedia.</td>
+                                <td colspan="11" class="text-center text-muted py-4">Belum ada booking yang tersedia.</td>
                             </tr>
                         @endforelse
                     </tbody>

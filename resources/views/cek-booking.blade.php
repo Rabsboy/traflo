@@ -41,7 +41,9 @@
                                             <th>Nama Paket</th>
                                             <th>Status</th>
                                             <th>Harga</th>
-                                            <th>Tanggal</th>
+                                            <th>Tanggal Booking</th>
+                                            <th>Keberangkatan</th>
+                                            <th>cetak invoice</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -71,6 +73,15 @@
                                             </td>
                                             <td>IDR {{ number_format($booking->travelPackage->price) }}</td>
                                             <td>{{ $booking->created_at->format('d M Y') }}</td>
+                                            <td>
+                                                {{ \Carbon\Carbon::parse($booking->departure_date)->format('d M Y') }}
+                                            </td>
+                                            <td><div class="text-end mt-4">
+    <a href="{{ route('booking.invoice.pdf', $booking->id) }}" class="btn btn-outline-danger">
+        🧾 Unduh PDF Invoice
+    </a>
+</div>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
